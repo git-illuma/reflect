@@ -1208,10 +1208,10 @@
   resolved "https://registry.yarnpkg.com/@unrs/resolver-binding-win32-x64-msvc/-/resolver-binding-win32-x64-msvc-1.11.1.tgz#538b1e103bf8d9864e7b85cc96fa8d6fb6c40777"
   integrity sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==
 
-"@zodyac/illuma@^1.6.3":
-  version "1.6.3"
-  resolved "https://registry.yarnpkg.com/@zodyac/illuma/-/illuma-1.6.3.tgz#751ef0b78f7d1d2ed09f32af0345997b8729a075"
-  integrity sha512-ICnpMSb1z9OYzpdlkKk4fH2WfrKZaIETw1MQ776LppAf0y+Llpn4Ac4tz3nZRjNGYiWi6u0hT0eVqfnclehRQA==
+"@zodyac/illuma@^1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@zodyac/illuma/-/illuma-1.7.0.tgz#bb9221f3a2ef173a4bf24eb20cc69f6b9a985664"
+  integrity sha512-6oZyxptIOEevFHHaLj+OEzNgSfOEovtVRa6kN9AKnvGeL9qvjJBH7XtRmJfMTWV5YLAdjNgcOXCJ8hZxn38EqA==
 
 acorn@^8.15.0:
   version "8.15.0"

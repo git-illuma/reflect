@@ -1,8 +1,7 @@
-import type { Ctor, MultiNodeToken, NodeBase } from "@zodyac/illuma";
+import type { Ctor, iInjectionNode, MultiNodeToken } from "@zodyac/illuma";
 import {
   extractToken,
   INJECTION_SYMBOL,
-  InjectionNode,
   isInjectable,
   NodeToken,
   nodeInject,
@@ -30,7 +29,7 @@ export function ReflectInjectable<T>() {
     const paramTypes = Reflect.getMetadata("design:paramtypes", ctor) || [];
 
     // Constructor parameter injections
-    const injections: InjectionNode<any>[] = [];
+    const injections: iInjectionNode<any>[] = [];
     for (let i = 0; i < paramTypes.length; i++) {
       const paramType = paramTypes[i];
       if (paramType == null) {
@@ -42,16 +41,14 @@ export function ReflectInjectable<T>() {
       // Check if @Inject() was used
       const token = Reflect.getMetadata(INJECTED_PATH, ctor, `param_${i}`);
       if (token) {
-        const node = new InjectionNode<NodeBase<any>>(token, !!optional);
-        injections.push(node);
+        injections.push({ token, optional: !!optional });
         continue;
       }
 
       // Check if NodeInjectable or ReflectInjectable
       if (isInjectable(paramType)) {
         const token = extractToken(paramType);
-        const node = new InjectionNode(token, !!optional);
-        injections.push(node);
+        injections.push({ token, optional: !!optional });
         continue;
       }
 
