@@ -1,4 +1,4 @@
-import { InjectionError } from "@zodyac/illuma";
+import { InjectionError } from "@illuma/core";
 
 export class ReflectInjectionError extends InjectionError {
   constructor(code: number, message: string) {

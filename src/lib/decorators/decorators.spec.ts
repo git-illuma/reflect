@@ -1,4 +1,4 @@
-import { NodeContainer, NodeToken } from "@zodyac/illuma";
+import { NodeContainer, NodeToken } from "@illuma/core";
 import { Inject } from "./inject";
 import { ReflectInjectable } from "./injectable";
 import { Optional } from "./optional";

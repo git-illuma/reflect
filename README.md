@@ -1,11 +1,11 @@
-# @zodyac/illuma-reflect – Reflect Metadata Plugin for Illuma
+# @illuma/core-reflect – Reflect Metadata Plugin for Illuma
 
-![NPM Version](https://img.shields.io/npm/v/%40zodyac%2Filluma-reflect)
-![NPM Downloads](https://img.shields.io/npm/dw/%40zodyac%2Filluma-reflect)
-![npm bundle size](https://img.shields.io/bundlephobia/min/%40zodyac%2Filluma-reflect)
+![NPM Version](https://img.shields.io/npm/v/%40illuma%2Freflect)
+![NPM Downloads](https://img.shields.io/npm/dw/%40illuma%2Freflect)
+![npm bundle size](https://img.shields.io/bundlephobia/min/%40illuma%2Freflect)
 ![Test coverage](./badges/coverage.svg)
 
-[Illuma](https://github.com/git-zodyac/illuma) plugin for reflect-metadata based dependency injection to declare dependencies via constructor parameters and decorators.
+[Illuma](https://github.com/git-illuma/core) plugin for reflect-metadata based dependency injection to declare dependencies via constructor parameters and decorators.
 
 > [!NOTE]
 > This package is in early development. Expect API changes in minor versions.
@@ -17,24 +17,22 @@
 
 ## Installation
 
-Requires `@zodyac/illuma` version `^1.6.3` or higher.
-
-Assuming you have `@zodyac/illuma` installed, you can add this plugin and `reflect-metadata` via Yarn or NPM:
+Assuming you have `@illuma/core` installed, you can add this plugin and `reflect-metadata` via Yarn or NPM:
 
 ```bash
-yarn add @zodyac/illuma-reflect reflect-metadata
+yarn add @illuma/core-reflect reflect-metadata
 # or
-npm install @zodyac/illuma-reflect reflect-metadata
+npm install @illuma/core-reflect reflect-metadata
 ```
 
 ## Usage
 
-This plugin provides decorators to enable reflection-based dependency injection with `@zodyac/illuma`.
+This plugin provides decorators to enable reflection-based dependency injection with `@illuma/core`.
 
 ```typescript
 import "reflect-metadata"; // Import this once at the entry point
-import { NodeContainer, NodeInjectable, NodeToken, nodeInject } from "@zodyac/illuma";
-import { ReflectInjectable, Inject, Optional } from "@zodyac/illuma-reflect";
+import { NodeContainer, NodeInjectable, NodeToken, nodeInject } from "@illuma/core";
+import { ReflectInjectable, Inject, Optional } from "@illuma/core-reflect";
 
 // Define tokens
 const API_KEY = new NodeToken<string>("API_KEY");
@@ -85,7 +83,7 @@ user.greet();
 
 ## Compatibility
 
-`@zodyac/illuma-reflect` is fully compatible with standard `@zodyac/illuma` decorators and injection methods. You can mix and match `@NodeInjectable`, `nodeInject`, and `@ReflectInjectable`, `@Inject` as needed.
+`@illuma/core-reflect` is fully compatible with standard `@illuma/core` decorators and injection methods. You can mix and match `@NodeInjectable`, `nodeInject`, and `@ReflectInjectable`, `@Inject` as needed.
 
 ## Features
 

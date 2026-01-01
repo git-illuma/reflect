@@ -4,7 +4,7 @@ import {
   NodeInjectable,
   NodeToken,
   nodeInject,
-} from "@zodyac/illuma";
+} from "@illuma/core";
 import { ReflectInjectionError } from "../errors";
 import { Inject } from "./inject";
 import { ReflectInjectable } from "./injectable";

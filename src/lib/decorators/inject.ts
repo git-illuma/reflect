@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/complexity/noBannedTypes: For decorators to work */
-import { MultiNodeToken, NodeToken } from "@zodyac/illuma";
+import { MultiNodeToken, NodeToken } from "@illuma/core";
 import { ReflectInjectionError } from "../errors";
 import { INJECTED_PATH, OPTIONAL_PATH, PROPS_PATH } from "./metadata";
 

@@ -1,11 +1,11 @@
-import type { Ctor, iInjectionNode, MultiNodeToken } from "@zodyac/illuma";
+import type { Ctor, iInjectionNode, MultiNodeToken } from "@illuma/core";
 import {
   extractToken,
   INJECTION_SYMBOL,
   isInjectable,
   NodeToken,
   nodeInject,
-} from "@zodyac/illuma";
+} from "@illuma/core";
 import { ReflectInjectionError } from "../errors";
 import { INJECTED_PATH, OPTIONAL_PATH, PROPS_PATH } from "./metadata";
 
