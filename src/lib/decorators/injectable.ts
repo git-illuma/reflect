@@ -27,8 +27,6 @@ import { INJECTED_PATH, OPTIONAL_PATH, PROPS_PATH } from "./metadata";
 export function ReflectInjectable<T>() {
   return (ctor: Ctor<T>): Ctor<T> => {
     const paramTypes = Reflect.getMetadata("design:paramtypes", ctor) || [];
-
-    // Constructor parameter injections
     const injections: iInjectionNode<any>[] = [];
     for (let i = 0; i < paramTypes.length; i++) {
       const paramType = paramTypes[i];
@@ -36,26 +34,23 @@ export function ReflectInjectable<T>() {
         throw ReflectInjectionError.unknownCtorType(i, ctor.name);
       }
 
-      const optional = Reflect.getMetadata(OPTIONAL_PATH, ctor, `param_${i}`);
-
-      // Check if @Inject() was used
       const token = Reflect.getMetadata(INJECTED_PATH, ctor, `param_${i}`);
+      const optional = !!Reflect.getMetadata(OPTIONAL_PATH, ctor, `param_${i}`);
       if (token) {
-        injections.push({ token, optional: !!optional });
+        injections.push({ token, optional });
         continue;
       }
 
       // Check if NodeInjectable or ReflectInjectable
       if (isInjectable(paramType)) {
         const token = extractToken(paramType);
-        injections.push({ token, optional: !!optional });
+        injections.push({ token, optional });
         continue;
       }
 
       throw ReflectInjectionError.nonInjectableParam(i, ctor.name);
     }
 
-    // Property injections
     const props = Reflect.getMetadata(PROPS_PATH, ctor) || [];
     const propInjections: {
       prop: string | symbol;
@@ -65,10 +60,8 @@ export function ReflectInjectable<T>() {
 
     for (const prop of props) {
       const token = Reflect.getMetadata(INJECTED_PATH, ctor, prop);
-      const optional = Reflect.getMetadata(OPTIONAL_PATH, ctor, prop);
-      if (token) {
-        propInjections.push({ prop, token, optional: !!optional });
-      }
+      const optional = !!Reflect.getMetadata(OPTIONAL_PATH, ctor, prop);
+      if (token) propInjections.push({ prop, token, optional });
     }
 
     const nodeToken = new NodeToken<T>(`_${ctor.name}`, {
