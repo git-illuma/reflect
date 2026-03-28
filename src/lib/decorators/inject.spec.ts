@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { ReflectInjectionError } from "../errors";
 import { Inject } from "./inject";
 

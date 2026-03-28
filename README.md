@@ -20,8 +20,6 @@
 Assuming you have `@illuma/core` installed, you can add this plugin and `reflect-metadata` via Yarn or NPM:
 
 ```bash
-yarn add @illuma/core-reflect reflect-metadata
-# or
 npm install @illuma/core-reflect reflect-metadata
 ```
 
@@ -29,8 +27,9 @@ npm install @illuma/core-reflect reflect-metadata
 
 | Package version               | Illuma Version         |
 |-------------------------------|------------------------|
-| `@illuma/core-reflect` ^1.0.0 | `@illuma/core` ^1.0.0  |
+| `@illuma/core-reflect` ^2.0.0 | `@illuma/core` ^2.0.0  |
 | `@illuma/core-reflect` ^1.3.1 | `@illuma/core` ^1.3.1  |
+| `@illuma/core-reflect` ^1.0.0 | `@illuma/core` ^1.0.0  |
 
 ## Usage
 

@@ -5,6 +5,7 @@ import {
   NodeToken,
   nodeInject,
 } from "@illuma/core";
+import { describe, expect, it, vi } from "vitest";
 import { ReflectInjectionError } from "../errors";
 import { Inject } from "./inject";
 import { ReflectInjectable } from "./injectable";
@@ -254,7 +255,7 @@ describe("@ReflectInjectable", () => {
   describe("edge cases", () => {
     it("should throw unknownCtorType when param type is undefined", () => {
       const originalGetMetadata = Reflect.getMetadata;
-      const spy = jest
+      const spy = vi
         .spyOn(Reflect, "getMetadata")
         .mockImplementation((key, target, propertyKey) => {
           if (key === "design:paramtypes") {
@@ -277,7 +278,7 @@ describe("@ReflectInjectable", () => {
 
     it("should handle missing design:paramtypes", () => {
       const originalGetMetadata = Reflect.getMetadata;
-      const spy = jest
+      const spy = vi
         .spyOn(Reflect, "getMetadata")
         .mockImplementation((key, target, propertyKey) => {
           if (key === "design:paramtypes") {

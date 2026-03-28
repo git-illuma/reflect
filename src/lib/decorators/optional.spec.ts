@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { describe, expect, it } from "vitest";
 import { Optional } from "./optional";
 
 describe("@Optional", () => {
