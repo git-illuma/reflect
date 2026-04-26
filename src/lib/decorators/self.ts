@@ -1,20 +1,19 @@
 import { INJECTION_CFG_PATH } from "./metadata";
 
 /**
- * Constructor parameter or property decorator to mark a dependency as optional.
- * If the dependency cannot be resolved, `null` will be injected instead of throwing an error.
+ * Constructor parameter or property decorator to mark a dependency to be resolved only in the current injector.
  *
  * @example
  * ```ts
  * @ReflectInjectable()
  * class MyService {
  *   constructor(
- *     @Optional() private optionalService?: OptionalService
+ *     @Self() private service: Service
  *   ) {}
  * }
  * ```
  */
-export function Optional(): ParameterDecorator & PropertyDecorator {
+export function Self(): ParameterDecorator & PropertyDecorator {
   return (
     target: any,
     propertyKey: string | symbol | undefined,
@@ -37,7 +36,7 @@ export function Optional(): ParameterDecorator & PropertyDecorator {
       INJECTION_CFG_PATH,
       {
         ...currentConfig,
-        optional: true,
+        self: true,
       },
       Ctor,
       metaKey,

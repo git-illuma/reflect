@@ -1,0 +1,39 @@
+{
+  "name": "@illuma/reflect",
+  "description": "Illuma plugin for reflect-metadata based dependency injection",
+  "author": "bebrasmell",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/git-illuma/reflect"
+  },
+  "version": "2.0.0",
+  "license": "MIT",
+  "publish": {
+    "include": [
+      "src/**/*",
+      "README.md"
+    ],
+    "exclude": [
+      "docs/**/*",
+      ".vscode/**/*",
+      ".github/**/*",
+      "artifacts/**/*",
+      "node_modules/**/*",
+      "dist/**/*",
+      ".editorconfig",
+      ".gitignore",
+      ".swcrc",
+      "tsconfig.json",
+      "biome.json",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "vitest.config.ts",
+      "**/*.test.ts",
+      "**/*.spec.ts"
+    ]
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

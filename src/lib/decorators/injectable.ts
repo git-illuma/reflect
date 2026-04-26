@@ -1,4 +1,4 @@
-import type { Ctor, iInjectionNode, MultiNodeToken } from "@illuma/core";
+import type { iInjectionNode, MultiNodeToken } from "@illuma/core";
 import {
   extractToken,
   isInjectable,
@@ -7,7 +7,7 @@ import {
   registerClassAsInjectable,
 } from "@illuma/core";
 import { ReflectInjectionError } from "../errors";
-import { INJECTED_PATH, OPTIONAL_PATH, PROPS_PATH } from "./metadata";
+import { INJECTED_PATH, INJECTION_CFG_PATH, PROPS_PATH } from "./metadata";
 
 /**
  * Class decorator that makes a class injectable via reflection (using `reflect-metadata`).
@@ -24,8 +24,8 @@ import { INJECTED_PATH, OPTIONAL_PATH, PROPS_PATH } from "./metadata";
  * }
  * ```
  */
-export function ReflectInjectable<T>() {
-  return (ctor: Ctor<T>): Ctor<T> => {
+export function ReflectInjectable<T>(): ClassDecorator {
+  return (ctor: any) => {
     const paramTypes = Reflect.getMetadata("design:paramtypes", ctor) || [];
     const injections: iInjectionNode<any>[] = [];
     for (let i = 0; i < paramTypes.length; i++) {
@@ -35,16 +35,26 @@ export function ReflectInjectable<T>() {
       }
 
       const token = Reflect.getMetadata(INJECTED_PATH, ctor, `param_${i}`);
-      const optional = !!Reflect.getMetadata(OPTIONAL_PATH, ctor, `param_${i}`);
+      const options = Reflect.getMetadata(INJECTION_CFG_PATH, ctor, `param_${i}`);
       if (token) {
-        injections.push({ token, optional });
+        injections.push({
+          token,
+          optional: options?.optional || false,
+          self: options?.self || false,
+          skipSelf: options?.skipSelf || false,
+        });
         continue;
       }
 
       // Check if NodeInjectable or ReflectInjectable
       if (isInjectable(paramType)) {
         const token = extractToken(paramType);
-        injections.push({ token, optional });
+        injections.push({
+          token,
+          optional: options?.optional || false,
+          self: options?.self || false,
+          skipSelf: options?.skipSelf || false,
+        });
         continue;
       }
 
@@ -56,21 +66,41 @@ export function ReflectInjectable<T>() {
       prop: string | symbol;
       token: NodeToken<any> | MultiNodeToken<any>;
       optional: boolean;
+      self: boolean;
+      skipSelf: boolean;
     }[] = [];
 
     for (const prop of props) {
       const token = Reflect.getMetadata(INJECTED_PATH, ctor, prop);
-      const optional = !!Reflect.getMetadata(OPTIONAL_PATH, ctor, prop);
-      if (token) propInjections.push({ prop, token, optional });
+      const options = Reflect.getMetadata(INJECTION_CFG_PATH, ctor, prop);
+      if (token)
+        propInjections.push({
+          prop,
+          token,
+          optional: options?.optional || false,
+          self: options?.self || false,
+          skipSelf: options?.skipSelf || false,
+        });
     }
 
     const nodeToken = new NodeToken<T>(`_${ctor.name}`, {
       factory: () => {
-        const deps = injections.map((d) => nodeInject(d.token, { optional: d.optional }));
-        const instance = new ctor(...deps);
+        const deps = injections.map((d) =>
+          nodeInject(d.token, {
+            optional: d.optional,
+            self: d.self,
+            skipSelf: d.skipSelf,
+          }),
+        );
 
-        for (const { prop, token, optional } of propInjections) {
-          (instance as any)[prop] = nodeInject(token, { optional });
+        const instance = new ctor(...deps);
+        for (const { prop, token, optional, self, skipSelf } of propInjections) {
+          Object.defineProperty(instance, prop, {
+            value: nodeInject(token, { optional, self, skipSelf }),
+            configurable: true,
+            enumerable: true,
+            writable: true,
+          });
         }
 
         return instance;

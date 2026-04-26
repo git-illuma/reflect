@@ -4,20 +4,34 @@ on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: "Release type (one of): patch, minor, major, prepatch, preminor, premajor, prerelease"
+        description: "Release type"
         required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prepatch
+          - preminor
+          - premajor
+          - prerelease
 jobs:
   release:
     runs-on: ubuntu-latest
     environment: Packages
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
+      id-token: write
     steps:
       # Checkout project repository
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Setup Bun
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
           registry-url: https://registry.npmjs.org/
@@ -60,11 +74,19 @@ jobs:
           version: ${{ env.NEW_VERSION }}
           operation: release
 
-      # Commit changes
-      - name: Commit CHANGELOG.md and package.json changes and create tag
+      # Bump jsr.json version
+      - name: Bump jsr.json version
         run: |
+          NEW_VER=${NEW_VERSION#v}
+          jq --arg ver "$NEW_VER" '.version = $ver' jsr.json > tmp.json && mv tmp.json jsr.json
+
+      # Commit changes
+      - name: Commit CHANGELOG.md, package.json and jsr.json changes and create tag
+        run: |
+          git checkout -b release/${{ env.NEW_VERSION }}
           git add "package.json"
           git add "CHANGELOG.md"
+          git add "jsr.json"
           git commit -m "chore: release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
@@ -72,18 +94,32 @@ jobs:
       - name: Build
         run: bun run build
 
-      # Publish version to public repository
-      - name: Publish
-        run: bun publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+      # Publish version to NPM
+      - name: Publish to NPM
         env:
           NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bun publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+
+      - name: Publish to JSR
+        run: bunx jsr publish --allow-dirty
 
       # Push repository changes
       - name: Push changes to repository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push origin && git push --tags
+          git push origin release/${{ env.NEW_VERSION }} && git push --tags
+
+      # Create Pull Request
+      - name: Create Pull Request to main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "chore: release ${{ env.NEW_VERSION }}" \
+            --body "Release PR for ${{ env.NEW_VERSION }}" \
+            --base main \
+            --head release/${{ env.NEW_VERSION }}
 
       # Read version changelog
       - id: get-changelog

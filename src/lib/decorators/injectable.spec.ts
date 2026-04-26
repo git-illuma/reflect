@@ -11,6 +11,8 @@ import { Inject } from "./inject";
 import { ReflectInjectable } from "./injectable";
 import { PROPS_PATH } from "./metadata";
 import { Optional } from "./optional";
+import { Self } from "./self";
+import { SkipSelf } from "./skipSelf";
 
 describe("@ReflectInjectable", () => {
   describe("@ReflectInjectable and @NodeInjectable compatibility", () => {
@@ -206,7 +208,7 @@ describe("@ReflectInjectable", () => {
       @ReflectInjectable()
       class DepClass {
         @Inject(propToken)
-        public readonly value!: number;
+        public value!: number;
       }
 
       const container = new NodeContainer();
@@ -224,7 +226,7 @@ describe("@ReflectInjectable", () => {
       @ReflectInjectable()
       class DepClass {
         @Inject(optionalPropToken, { optional: true })
-        public readonly value!: number;
+        public value!: number;
       }
 
       const container = new NodeContainer();
@@ -249,6 +251,97 @@ describe("@ReflectInjectable", () => {
         container.bootstrap();
         container.get(DepClass);
       }).toThrow(ReflectInjectionError);
+    });
+  });
+
+  describe("self and skipSelf injections", () => {
+    it("should respect @Self decorator", () => {
+      const depToken = new NodeToken<string>("Token");
+
+      @ReflectInjectable()
+      class DepClass {
+        constructor(@Self() @Inject(depToken) public readonly value: string) {}
+      }
+
+      const parent = new NodeContainer();
+      parent.provide({ provide: depToken, value: "parent" });
+      parent.bootstrap();
+
+      const child = new NodeContainer({ parent });
+      child.provide(DepClass);
+
+      // DepClass requests depToken from 'self' (the child container).
+      expect(() => child.bootstrap()).toThrow();
+    });
+
+    it("should respect @SkipSelf decorator", () => {
+      const depToken = new NodeToken<string>("Token");
+
+      @ReflectInjectable()
+      class DepClass {
+        constructor(@SkipSelf() @Inject(depToken) public readonly value: string) {}
+      }
+
+      const parent = new NodeContainer();
+      parent.provide({ provide: depToken, value: "parent" });
+      parent.bootstrap();
+
+      const child = new NodeContainer({ parent });
+      child.provide({ provide: depToken, value: "child" });
+      child.provide(DepClass);
+      child.bootstrap();
+
+      // Should skip 'child' and get 'parent'
+      expect(child.get(DepClass).value).toBe("parent");
+    });
+    it("should respect @Self decorator (or { self: true } option)", () => {
+      const depToken = new NodeToken<string>("Token");
+
+      @ReflectInjectable()
+      class DepClass {
+        constructor(@Inject(depToken, { self: true }) public readonly value: string) {}
+      }
+
+      const parent = new NodeContainer();
+      parent.provide({ provide: depToken, value: "parent" });
+      parent.bootstrap();
+
+      const child = new NodeContainer({ parent });
+      child.provide(DepClass);
+
+      // DepClass requests depToken from 'self' (the child container).
+      // Since it's only in parent, resolving it should throw.
+      expect(() => child.bootstrap()).toThrow();
+
+      // If we provide it in the child container, it should resolve successfully.
+      const childWithDep = new NodeContainer({ parent });
+      childWithDep.provide({ provide: depToken, value: "child" });
+      childWithDep.provide(DepClass);
+      childWithDep.bootstrap();
+      expect(childWithDep.get(DepClass).value).toBe("child");
+    });
+
+    it("should respect @SkipSelf decorator (or { skipSelf: true } option)", () => {
+      const depToken = new NodeToken<string>("Token");
+
+      @ReflectInjectable()
+      class DepClass {
+        constructor(
+          @Inject(depToken, { skipSelf: true }) public readonly value: string,
+        ) {}
+      }
+
+      const parent = new NodeContainer();
+      parent.provide({ provide: depToken, value: "parent" });
+      parent.bootstrap();
+
+      const child = new NodeContainer({ parent });
+      child.provide({ provide: depToken, value: "child" });
+      child.provide(DepClass);
+      child.bootstrap();
+
+      // DepClass requests depToken with 'skipSelf', so it should skip 'child' and get 'parent'
+      expect(child.get(DepClass).value).toBe("parent");
     });
   });
 

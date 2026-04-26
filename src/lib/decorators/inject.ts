@@ -1,11 +1,16 @@
 /** biome-ignore-all lint/complexity/noBannedTypes: For decorators to work */
 import { MultiNodeToken, NodeToken } from "@illuma/core";
 import { ReflectInjectionError } from "../errors";
-import { INJECTED_PATH, OPTIONAL_PATH, PROPS_PATH } from "./metadata";
+import { INJECTED_PATH, INJECTION_CFG_PATH, PROPS_PATH } from "./metadata";
 
+/** Options for the `@Inject` decorator */
 export interface iInjectOptions {
   /** Whether the dependency is optional (default: false) */
   optional?: boolean;
+  /** Whether to only look for the dependency in the current injector (default: false) */
+  self?: boolean;
+  /** Whether to skip the current injector and look in parent injectors (default: false) */
+  skipSelf?: boolean;
 }
 
 /**
@@ -46,33 +51,47 @@ export function Inject<T>(
     parameterIndex?: number,
   ): any => {
     const Ctor = typeof target === "function" ? target : target.constructor;
+    const isProperty =
+      typeof propKey !== "undefined" && typeof parameterIndex === "undefined";
+    const isConstructorParam =
+      typeof propKey === "undefined" && typeof parameterIndex !== "undefined";
 
-    // Property Injection
-    if (typeof propKey !== "undefined" && typeof parameterIndex === "undefined") {
-      Reflect.defineMetadata(INJECTED_PATH, token, Ctor, propKey);
-      if (opts?.optional) {
-        Reflect.defineMetadata(OPTIONAL_PATH, true, Ctor, propKey);
-      }
-
-      const props = Reflect.getMetadata(PROPS_PATH, Ctor) || [];
-      props.push(propKey);
-      Reflect.defineMetadata(PROPS_PATH, props, Ctor);
-
-      return;
+    // Ignore method parameters
+    if (!isProperty && !isConstructorParam) {
+      return target;
     }
 
-    // Constructor Parameter Injection
-    if (typeof propKey === "undefined" && typeof parameterIndex !== "undefined") {
+    const metaKey = isProperty ? propKey : `param_${parameterIndex}`;
+
+    // Property Injection
+    if (isProperty) {
+      Reflect.defineMetadata(INJECTED_PATH, token, Ctor, metaKey as string | symbol);
+      const props = Reflect.getMetadata(PROPS_PATH, Ctor) || [];
+      if (!props.includes(metaKey)) {
+        props.push(metaKey);
+        Reflect.defineMetadata(PROPS_PATH, props, Ctor);
+      }
+    } else if (isConstructorParam) {
       if (!(token instanceof NodeToken) && !(token instanceof MultiNodeToken)) {
         throw ReflectInjectionError.notToken();
       }
 
-      Reflect.defineMetadata(INJECTED_PATH, token, Ctor, `param_${parameterIndex}`);
-
-      if (opts?.optional) {
-        Reflect.defineMetadata(OPTIONAL_PATH, true, Ctor, `param_${parameterIndex}`);
-      }
+      Reflect.defineMetadata(INJECTED_PATH, token, Ctor, metaKey as string);
     }
+
+    const currentConfig =
+      Reflect.getMetadata(INJECTION_CFG_PATH, Ctor, metaKey as string | symbol) || {};
+    Reflect.defineMetadata(
+      INJECTION_CFG_PATH,
+      {
+        ...currentConfig,
+        optional: opts?.optional ?? currentConfig.optional ?? false,
+        self: opts?.self ?? currentConfig.self ?? false,
+        skipSelf: opts?.skipSelf ?? currentConfig.skipSelf ?? false,
+      },
+      Ctor,
+      metaKey as string | symbol,
+    );
 
     return target;
   };

@@ -1,9 +1,10 @@
 # @illuma/core-reflect – Reflect Metadata Plugin for Illuma
 
-![NPM Version](https://img.shields.io/npm/v/%40illuma%2Freflect)
-![NPM Downloads](https://img.shields.io/npm/dw/%40illuma%2Freflect)
-![npm bundle size](https://img.shields.io/bundlephobia/min/%40illuma%2Freflect)
-![Test coverage](./badges/coverage.svg)
+![NPM Version](https://img.shields.io/npm/v/%40illuma%2Freflect?labelColor=gray&color=gray)
+![JSR Version](https://img.shields.io/jsr/v/%40illuma%2Freflect?labelColor=gray&color=gray)
+![NPM Downloads](https://img.shields.io/npm/dw/%40illuma%2Freflect?labelColor=gray&color=gray)
+![npm bundle size](https://img.shields.io/bundlephobia/min/%40illuma%2Freflect?labelColor=gray&color=gray)
+![Test coverage](https://raw.githubusercontent.com/git-illuma/reflect/refs/heads/main/badges/coverage.svg)
 
 [Illuma](https://github.com/git-illuma/core) plugin for reflect-metadata based dependency injection to declare dependencies via constructor parameters and decorators.
 
@@ -27,6 +28,7 @@ npm install @illuma/core-reflect reflect-metadata
 
 | Package version               | Illuma Version         |
 |-------------------------------|------------------------|
+| `@illuma/core-reflect` ^2.1.0 | `@illuma/core` ^2.1.0  |
 | `@illuma/core-reflect` ^2.0.0 | `@illuma/core` ^2.0.0  |
 | `@illuma/core-reflect` ^1.3.1 | `@illuma/core` ^1.3.1  |
 | `@illuma/core-reflect` ^1.0.0 | `@illuma/core` ^1.0.0  |
